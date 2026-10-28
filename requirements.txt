@@ -1,0 +1,17 @@
+fastapi
+uvicorn[standard]
+sqlalchemy[asyncio]
+asyncpg
+alembic
+pydantic-settings
+pyjwt
+argon2-cffi
+arq
+qdrant-client
+sentence-transformers
+langgraph
+langchain-groq
+langchain-text-splitters
+pytest
+pytest-asyncio
+httpx
