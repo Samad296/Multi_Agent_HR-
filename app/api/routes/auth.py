@@ -1,15 +1,19 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from app.db.session import SessionLocal
+
+from app.core.limiter import limiter
+from app.core.security import create_token, hash_password, verify_password
 from app.db.models import Tenant, User
-from app.core.security import hash_password, verify_password, create_token
-from app.schemas.auth import SignupRequest, LoginRequest, TokenResponse
+from app.db.session import SessionLocal
+from app.schemas.auth import LoginRequest, SignupRequest, TokenResponse
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+
 @router.post("/signup", response_model=TokenResponse, status_code=201)
-def signup(body: SignupRequest):
+@limiter.limit("5/hour")
+def signup(request: Request, body: SignupRequest):
     with SessionLocal() as db:
         try:
             tenant = Tenant(name=body.company_name)
@@ -28,8 +32,10 @@ def signup(body: SignupRequest):
             raise HTTPException(409, "Company or email already registered")
         return TokenResponse(access_token=create_token(user))
 
+
 @router.post("/login", response_model=TokenResponse)
-def login(body: LoginRequest):
+@limiter.limit("10/minute")
+def login(request: Request, body: LoginRequest):
     with SessionLocal() as db:
         user = db.scalar(select(User).where(User.email == body.email.lower()))
         if not user or not verify_password(body.password, user.password_hash):
