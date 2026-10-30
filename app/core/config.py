@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     RETRIEVAL_MIN_SCORE: float = 0.25   # calibrate in step 5, don't guess
     GROQ_ROUTER_MODEL:str="openai/gpt-oss-20b"
     GROQ_ANSWER_MODEL:str="openai/gpt-oss-120b"
+    CHAT_DAILY_LIMIT: int = 300    # chat messages per company per UTC day
+
     @field_validator("JWT_SECRET")
     @classmethod
     def secret_long_enough(cls, v: str) -> str:
