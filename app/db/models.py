@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, date
-from sqlalchemy import JSON, Date, DateTime, ForeignKey, String, Text, Integer, func
+from sqlalchemy import JSON, Date, DateTime, ForeignKey, String, Text, Integer, func, Index
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
 
@@ -59,6 +59,10 @@ class LeaveRequest(Base):
 
 class AuditLog(Base):
     __tablename__ = "audit_log"
+
+    __table_args__ = (
+        Index("ix_audit_log_tenant_action_created", "tenant_id", "action", "created_at"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     tenant_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("tenants.id"), index=True)
