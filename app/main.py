@@ -6,13 +6,12 @@ from slowapi.errors import RateLimitExceeded
 from app.api.deps import TenantContext, get_context
 from app.api.routes import auth, chat, documents, leave, users
 from app.core.limiter import limiter
-from app.db.models import Base
-from app.db.session import admin_engine
 from app.services.leave_service import LeaveError
 
-Base.metadata.create_all(admin_engine)  # temporary: replaced by Alembic later
 
-app = FastAPI(title="HR Knowledge Agent")
+app = FastAPI(title="HR Knowledge Agent",
+              version="0.1.0",
+              description="A private HR assistant for your company. ")
 
 # rate limiting: the limiter object is shared, and over-limit calls get a clean 429
 app.state.limiter = limiter
