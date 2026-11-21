@@ -4,8 +4,11 @@ from sqlalchemy import JSON, Date, DateTime, ForeignKey, String, Text, Integer, 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
 
+
 class Base(DeclarativeBase):
     pass
+
+
 class Tenant(Base):
     __tablename__ = "tenants"
 
@@ -17,6 +20,8 @@ class Tenant(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -25,7 +30,13 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True)
     password_hash: Mapped[str] = mapped_column(String(255))
     role: Mapped[str] = mapped_column(String(20), default="employee")
+    full_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    manager_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id"), nullable=True, index=True
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
 class LeaveType(Base):
     __tablename__ = "leave_types"
 
@@ -33,6 +44,8 @@ class LeaveType(Base):
     tenant_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("tenants.id"), index=True)
     name: Mapped[str] = mapped_column(String(50))
     days_per_year: Mapped[int] = mapped_column(Integer)
+
+
 class LeaveBalance(Base):
     __tablename__ = "leave_balances"
 
@@ -54,6 +67,8 @@ class LeaveRequest(Base):
     end_date: Mapped[date] = mapped_column(Date)
     status: Mapped[str] = mapped_column(String(20), default="pending")  # pending | approved | rejected | cancelled
     reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    decision_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
@@ -70,5 +85,3 @@ class AuditLog(Base):
     action: Mapped[str] = mapped_column(String(100))
     detail: Mapped[dict] = mapped_column(JSON, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-
-    
