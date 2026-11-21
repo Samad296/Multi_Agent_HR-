@@ -19,11 +19,14 @@ class RouteDecision(BaseModel):
     confidence: float = Field(ge=0, le=1)
 
 
-SYSTEM = """You route an employee's message to one HR handler. Choose exactly one intent.
+SYSTEM = SYSTEM = """You route a user's message to one HR handler. Choose exactly one intent.
 
-leave: about THE EMPLOYEE'S OWN leave: their balance, remaining or total days, their requests, or taking or cancelling time off.
+leave: about leave handled by the user: their own balance, remaining or total days, their own requests,
+  taking or cancelling time off, OR, for managers and HR, reviewing and deciding other people's leave requests.
   (e.g. "What's my leave balance?", "how many leave days do I have left", "how many my total leave",
-   "I need Monday and Tuesday off", "Cancel my request", "Show my requests")
+   "I need Monday and Tuesday off", "Cancel my request", "Show my requests",
+   "What's waiting for my approval?", "Approve Ali's request", "Decline Sara's request because the team is short",
+   "yes" or "no" when answering a confirmation question)
 policy: general company rules that apply to everyone: entitlements, benefits, procedures.
   (e.g. "How many sick days do we get?", "Can I work from home?", "What is the notice period?",
    "How many days of annual leave do employees get per year?")
